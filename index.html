@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación: Estática y Dinámica (Física)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #333;
+        }
+        .quiz-container {
+            background-color: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 800px;
+        }
+        .question {
+            margin-bottom: 15px;
+        }
+        .options {
+            list-style-type: none;
+            padding: 0;
+        }
+        .options li {
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #results {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Evaluación: Estática y Dinámica (Física)</h1>
+    <div class="quiz-container">
+        <div id="quiz"></div>
+        <button id="submit">Enviar respuestas</button>
+        <div id="results"></div>
+    </div>
+    <footer>
+        &copy; Derechos Reservados Prof. Alberto Sanchez
+    </footer>
+    <script>
+        const quizData = [
+            {
+                question: "¿Qué es la estática?",
+                answers: [
+                    { text: "El estudio de los cuerpos en reposo y las fuerzas que actúan sobre ellos.", correct: true },
+                    { text: "El estudio de los cuerpos en movimiento.", correct: false },
+                    { text: "El estudio de la energía y el trabajo.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es la dinámica?",
+                answers: [
+                    { text: "El estudio de los cuerpos en movimiento y las fuerzas que actúan sobre ellos.", correct: true },
+                    { text: "El estudio de los cuerpos en reposo.", correct: false },
+                    { text: "El estudio de la energía potencial.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es el equilibrio estático?",
+                answers: [
+                    { text: "La condición en la que un objeto está en reposo y todas las fuerzas que actúan sobre él están balanceadas.", correct: true },
+                    { text: "La condición en la que un objeto está en movimiento constante.", correct: false },
+                    { text: "La condición en la que un objeto está acelerando.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es el centro de masa?",
+                answers: [
+                    { text: "El punto en un objeto donde se considera que toda su masa está concentrada.", correct: true },
+                    { text: "El punto en un objeto donde actúa la fuerza de fricción.", correct: false },
+                    { text: "El punto en un objeto donde actúa la fuerza centrípeta.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es el momento de una fuerza?",
+                answers: [
+                    { text: "La tendencia de una fuerza a hacer girar un objeto alrededor de un punto.", correct: true },
+                    { text: "La velocidad de un objeto en movimiento.", correct: false },
+                    { text: "La energía cinética de un objeto.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es una palanca?",
+                answers: [
+                    { text: "Una barra rígida que gira alrededor de un punto fijo llamado fulcro.", correct: true },
+                    { text: "Un tipo de máquina simple que reduce la fricción.", correct: false },
+                    { text: "Un sistema que aumenta la velocidad de un objeto.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es la ley de la palanca?",
+                answers: [
+                    { text: "En equilibrio, el producto de la fuerza y su distancia al fulcro es igual a la suma de los productos de las otras fuerzas y sus distancias al fulcro.", correct: true },
+                    { text: "La fuerza es igual a la masa por la aceleración.", correct: false },
+                    { text: "Para cada acción, hay una reacción igual y opuesta.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es una polea?",
+                answers: [
+                    { text: "Una rueda con una cuerda que se utiliza para cambiar la dirección de una fuerza.", correct: true },
+                    { text: "Una barra rígida que gira alrededor de un punto fijo.", correct: false },
+                    { text: "Un plano inclinado utilizado para levantar objetos.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es el principio de Pascal?",
+                answers: [
+                    { text: "La presión aplicada en un fluido se transmite uniformemente en todas las direcciones.", correct: true },
+                    { text: "La fuerza es igual a la masa por la aceleración.", correct: false },
+                    { text: "Un objeto en reposo permanecerá en reposo a menos que una fuerza actúe sobre él.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es el principio de Arquímedes?",
+                answers: [
+                    { text: "Un objeto sumergido en un fluido experimenta una fuerza de flotación igual al peso del fluido desplazado.", correct: true },
+                    { text: "La fuerza es igual a la masa por la aceleración.", correct: false },
+                    { text: "Un objeto en reposo permanecerá en reposo a menos que una fuerza actúe sobre él.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es el par de fuerzas?",
+                answers: [
+                    { text: "Dos fuerzas iguales y opuestas que actúan sobre un objeto en direcciones opuestas.", correct: true },
+                    { text: "Dos fuerzas desiguales que actúan sobre un objeto en la misma dirección.", correct: false },
+                    { text: "Dos fuerzas iguales que actúan sobre un objeto en la misma dirección.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es la fricción estática?",
+                answers: [
+                    { text: "La fricción que actúa sobre un objeto en reposo.", correct: true },
+                    { text: "La fricción que actúa sobre un objeto en movimiento.", correct: false },
+                    { text: "La fricción que actúa sobre un objeto en un fluido.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es la fricción cinética?",
+                answers: [
+                    { text: "La fricción que actúa sobre un objeto en movimiento.", correct: true },
+                    { text: "La fricción que actúa sobre un objeto en reposo.", correct: false },
+                    { text: "La fricción que actúa sobre un objeto en un fluido.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es un sistema de referencia?",
+                answers: [
+                    { text: "Un marco de referencia para medir y observar el movimiento de un objeto.", correct: true },
+                    { text: "Un instrumento para medir la fuerza.", correct: false },
+                    { text: "Una técnica para calcular la velocidad.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es la aceleración angular?",
+                answers: [
+                    { text: "El cambio en la velocidad angular por unidad de tiempo.", correct: true },
+                    { text: "La velocidad angular de un objeto.", correct: false },
+                    { text: "La distancia angular recorrida por un objeto.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es la velocidad angular?",
+                answers: [
+                    { text: "La rapidez con la que un objeto gira o rota.", correct: true },
+                    { text: "El cambio en la velocidad por unidad de tiempo.", correct: false },
+                    { text: "La distancia recorrida por un objeto en movimiento circular.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es la inercia rotacional?",
+                answers: [
+                    { text: "La resistencia de un objeto a cambiar su estado de rotación.", correct: true },
+                    { text: "La resistencia de un objeto a cambiar su estado de movimiento lineal.", correct: false },
+                    { text: "La fuerza aplicada a un objeto en rotación.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es el momento angular?",
+                answers: [
+                    { text: "La cantidad de movimiento en rotación de un objeto.", correct: true },
+                    { text: "La cantidad de movimiento en línea recta de un objeto.", correct: false },
+                    { text: "La energía cinética de un objeto en rotación.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es el equilibrio dinámico?",
+                answers: [
+                    { text: "La condición en la que un objeto en movimiento tiene fuerzas balanceadas.", correct: true },
+                    { text: "La condición en la que un objeto en reposo tiene fuerzas balanceadas.", correct: false },
+                    { text: "La condición en la que un objeto está acelerando.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es la ley de Hooke?",
+                answers: [
+                    { text: "La fuerza ejercida por un resorte es proporcional a su deformación.", correct: true },
+                    { text: "La fuerza es igual a la masa por la aceleración.", correct: false },
+                    { text: "La presión aplicada en un fluido se transmite uniformemente.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es el módulo de Young?",
+                answers: [
+                    { text: "Una medida de la rigidez de un material.", correct: true },
+                    { text: "Una medida de la densidad de un material.", correct: false },
+                    { text: "Una medida de la dureza de un material.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es la tensión en física?",
+                answers: [
+                    { text: "La fuerza por unidad de área aplicada sobre un objeto.", correct: true },
+                    { text: "La resistencia de un material a la deformación.", correct: false },
+                    { text: "La velocidad de un objeto en movimiento.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es la deformación?",
+                answers: [
+                    { text: "El cambio en la forma o tamaño de un objeto debido a una fuerza aplicada.", correct: true },
+                    { text: "La velocidad de un objeto en movimiento.", correct: false },
+                    { text: "La resistencia de un objeto a cambiar su estado de movimiento.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es el esfuerzo cortante?",
+                answers: [
+                    { text: "Una fuerza que causa deformación por deslizamiento en un objeto.", correct: true },
+                    { text: "Una fuerza que causa compresión en un objeto.", correct: false },
+                    { text: "Una fuerza que causa tensión en un objeto.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es la presión en física?",
+                answers: [
+                    { text: "La fuerza aplicada por unidad de área.", correct: true },
+                    { text: "La fuerza de fricción en un objeto.", correct: false },
+                    { text: "La energía cinética de un objeto en movimiento.", correct: false }
+                ]
+            }
+        ];
+
+        let attempt = 0;
+        const maxAttempts = 3;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function loadQuiz() {
+            const quizContainer = document.getElementById('quiz');
+            quizContainer.innerHTML = '';
+            quizData.forEach((data, index) => {
+                const questionContainer = document.createElement('div');
+                questionContainer.className = 'question';
+
+                const questionTitle = document.createElement('h3');
+                questionTitle.innerText = `${index + 1}. ${data.question}`;
+                questionContainer.appendChild(questionTitle);
+
+                const optionsList = document.createElement('ul');
+                optionsList.className = 'options';
+
+                shuffle(data.answers).forEach(answer => {
+                    const option = document.createElement('li');
+                    const optionLabel = document.createElement('label');
+                    const optionInput = document.createElement('input');
+                    optionInput.type = 'radio';
+                    optionInput.name = `question${index}`;
+                    optionInput.value = answer.correct;
+                    optionLabel.appendChild(optionInput);
+                    optionLabel.appendChild(document.createTextNode(answer.text));
+                    option.appendChild(optionLabel);
+                    optionsList.appendChild(option);
+                });
+
+                questionContainer.appendChild(optionsList);
+                quizContainer.appendChild(questionContainer);
+            });
+        }
+
+        function submitQuiz() {
+            if (attempt >= maxAttempts) {
+                alert('Has alcanzado el número máximo de intentos.');
+                return;
+            }
+
+            const resultsContainer = document.getElementById('results');
+            const answers = document.querySelectorAll('input[type="radio"]:checked');
+            let score = 0;
+
+            quizData.forEach((data, index) => {
+                const selected = answers[index] ? answers[index].value === 'true' : null;
+                if (selected === true) {
+                    score += 0.4; // Each correct answer is worth 0.4 points
+                }
+            });
+
+            score = Math.round(score * 10) / 10; // Round to one decimal place
+            let feedback = quizData.map((data, index) => {
+                const selected = answers[index] ? answers[index].value === 'true' : null;
+                let result;
+                if (selected === null) {
+                    result = "No contestada";
+                } else if (selected === true) {
+                    result = "Correcta";
+                } else {
+                    result = "Incorrecta";
+                }
+                return `<p>${index + 1}. ${result}</p>`;
+            }).join("");
+
+            resultsContainer.innerHTML = `<h3>Resultados:</h3><p>Puntaje: ${score} / 10</p>${feedback}`;
+
+            attempt++;
+            if (attempt >= maxAttempts) {
+                alert('Has alcanzado el número máximo de intentos.');
+            }
+        }
+
+        document.getElementById('submit').addEventListener('click', submitQuiz);
+
+        loadQuiz();
+    </script>
+</body>
+</html>

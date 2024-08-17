@@ -3,365 +3,1001 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluación: Estática y Dinámica (Física)</title>
+    <title>Unidad 3: Estática y Dinámica</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        h1 {
-            color: #333;
-        }
-        .quiz-container {
-            background-color: #fff;
             padding: 20px;
-            margin: 20px 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 800px;
+        }
+        h1, h2 {
+            text-align: center;
         }
         .question {
-            margin-bottom: 15px;
+            margin: 20px 0;
         }
-        .options {
-            list-style-type: none;
-            padding: 0;
-        }
-        .options li {
+        .question label {
+            font-weight: bold;
+            display: block;
             margin-bottom: 10px;
         }
-        button {
+        .question .options {
+            margin-left: 20px;
+        }
+        .question .options input {
+            margin-right: 10px;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+        }
+        .popup-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+        .popup-content input {
+            margin-bottom: 20px;
+            padding: 15px;
+            width: 80%;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .popup-content button {
+            padding: 15px 30px;
             background-color: #28a745;
             color: #fff;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
             font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
-        button:hover {
-            background-color: #218838;
-        }
-        #results {
-            margin-top: 20px;
-            font-size: 18px;
-        }
-        footer {
-            background-color: #333;
+        button.submit-btn {
+            padding: 15px 30px;
+            background-color: #007bff;
             color: #fff;
-            padding: 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: block;
             width: 100%;
             text-align: center;
-            position: fixed;
-            bottom: 0;
+        }
+        button.submit-btn:hover {
+            background-color: #0056b3;
+        }
+        #timer {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Evaluación: Estática y Dinámica (Física)</h1>
-    <div class="quiz-container">
-        <div id="quiz"></div>
-        <button id="submit">Enviar respuestas</button>
-        <div id="results"></div>
+
+<div class="popup" id="popup">
+    <div class="popup-content">
+        <h2>Complete la siguiente información</h2>
+        <input type="text" id="nombre" placeholder="Nombre Completo" required>
+        <input type="text" id="nie" placeholder="NIE" required>
+        <button onclick="validatePopup()">Continuar</button>
     </div>
-    <footer>
-        &copy; Derechos Reservados Prof. Alberto Sanchez
-    </footer>
-    <script>
-        const quizData = [
-            {
-                question: "¿Qué es la estática?",
-                answers: [
-                    { text: "El estudio de los cuerpos en reposo y las fuerzas que actúan sobre ellos.", correct: true },
-                    { text: "El estudio de los cuerpos en movimiento.", correct: false },
-                    { text: "El estudio de la energía y el trabajo.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es la dinámica?",
-                answers: [
-                    { text: "El estudio de los cuerpos en movimiento y las fuerzas que actúan sobre ellos.", correct: true },
-                    { text: "El estudio de los cuerpos en reposo.", correct: false },
-                    { text: "El estudio de la energía potencial.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es el equilibrio estático?",
-                answers: [
-                    { text: "La condición en la que un objeto está en reposo y todas las fuerzas que actúan sobre él están balanceadas.", correct: true },
-                    { text: "La condición en la que un objeto está en movimiento constante.", correct: false },
-                    { text: "La condición en la que un objeto está acelerando.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es el centro de masa?",
-                answers: [
-                    { text: "El punto en un objeto donde se considera que toda su masa está concentrada.", correct: true },
-                    { text: "El punto en un objeto donde actúa la fuerza de fricción.", correct: false },
-                    { text: "El punto en un objeto donde actúa la fuerza centrípeta.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es el momento de una fuerza?",
-                answers: [
-                    { text: "La tendencia de una fuerza a hacer girar un objeto alrededor de un punto.", correct: true },
-                    { text: "La velocidad de un objeto en movimiento.", correct: false },
-                    { text: "La energía cinética de un objeto.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es una palanca?",
-                answers: [
-                    { text: "Una barra rígida que gira alrededor de un punto fijo llamado fulcro.", correct: true },
-                    { text: "Un tipo de máquina simple que reduce la fricción.", correct: false },
-                    { text: "Un sistema que aumenta la velocidad de un objeto.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es la ley de la palanca?",
-                answers: [
-                    { text: "En equilibrio, el producto de la fuerza y su distancia al fulcro es igual a la suma de los productos de las otras fuerzas y sus distancias al fulcro.", correct: true },
-                    { text: "La fuerza es igual a la masa por la aceleración.", correct: false },
-                    { text: "Para cada acción, hay una reacción igual y opuesta.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es una polea?",
-                answers: [
-                    { text: "Una rueda con una cuerda que se utiliza para cambiar la dirección de una fuerza.", correct: true },
-                    { text: "Una barra rígida que gira alrededor de un punto fijo.", correct: false },
-                    { text: "Un plano inclinado utilizado para levantar objetos.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es el principio de Pascal?",
-                answers: [
-                    { text: "La presión aplicada en un fluido se transmite uniformemente en todas las direcciones.", correct: true },
-                    { text: "La fuerza es igual a la masa por la aceleración.", correct: false },
-                    { text: "Un objeto en reposo permanecerá en reposo a menos que una fuerza actúe sobre él.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es el principio de Arquímedes?",
-                answers: [
-                    { text: "Un objeto sumergido en un fluido experimenta una fuerza de flotación igual al peso del fluido desplazado.", correct: true },
-                    { text: "La fuerza es igual a la masa por la aceleración.", correct: false },
-                    { text: "Un objeto en reposo permanecerá en reposo a menos que una fuerza actúe sobre él.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es el par de fuerzas?",
-                answers: [
-                    { text: "Dos fuerzas iguales y opuestas que actúan sobre un objeto en direcciones opuestas.", correct: true },
-                    { text: "Dos fuerzas desiguales que actúan sobre un objeto en la misma dirección.", correct: false },
-                    { text: "Dos fuerzas iguales que actúan sobre un objeto en la misma dirección.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es la fricción estática?",
-                answers: [
-                    { text: "La fricción que actúa sobre un objeto en reposo.", correct: true },
-                    { text: "La fricción que actúa sobre un objeto en movimiento.", correct: false },
-                    { text: "La fricción que actúa sobre un objeto en un fluido.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es la fricción cinética?",
-                answers: [
-                    { text: "La fricción que actúa sobre un objeto en movimiento.", correct: true },
-                    { text: "La fricción que actúa sobre un objeto en reposo.", correct: false },
-                    { text: "La fricción que actúa sobre un objeto en un fluido.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es un sistema de referencia?",
-                answers: [
-                    { text: "Un marco de referencia para medir y observar el movimiento de un objeto.", correct: true },
-                    { text: "Un instrumento para medir la fuerza.", correct: false },
-                    { text: "Una técnica para calcular la velocidad.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es la aceleración angular?",
-                answers: [
-                    { text: "El cambio en la velocidad angular por unidad de tiempo.", correct: true },
-                    { text: "La velocidad angular de un objeto.", correct: false },
-                    { text: "La distancia angular recorrida por un objeto.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es la velocidad angular?",
-                answers: [
-                    { text: "La rapidez con la que un objeto gira o rota.", correct: true },
-                    { text: "El cambio en la velocidad por unidad de tiempo.", correct: false },
-                    { text: "La distancia recorrida por un objeto en movimiento circular.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es la inercia rotacional?",
-                answers: [
-                    { text: "La resistencia de un objeto a cambiar su estado de rotación.", correct: true },
-                    { text: "La resistencia de un objeto a cambiar su estado de movimiento lineal.", correct: false },
-                    { text: "La fuerza aplicada a un objeto en rotación.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es el momento angular?",
-                answers: [
-                    { text: "La cantidad de movimiento en rotación de un objeto.", correct: true },
-                    { text: "La cantidad de movimiento en línea recta de un objeto.", correct: false },
-                    { text: "La energía cinética de un objeto en rotación.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es el equilibrio dinámico?",
-                answers: [
-                    { text: "La condición en la que un objeto en movimiento tiene fuerzas balanceadas.", correct: true },
-                    { text: "La condición en la que un objeto en reposo tiene fuerzas balanceadas.", correct: false },
-                    { text: "La condición en la que un objeto está acelerando.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es la ley de Hooke?",
-                answers: [
-                    { text: "La fuerza ejercida por un resorte es proporcional a su deformación.", correct: true },
-                    { text: "La fuerza es igual a la masa por la aceleración.", correct: false },
-                    { text: "La presión aplicada en un fluido se transmite uniformemente.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es el módulo de Young?",
-                answers: [
-                    { text: "Una medida de la rigidez de un material.", correct: true },
-                    { text: "Una medida de la densidad de un material.", correct: false },
-                    { text: "Una medida de la dureza de un material.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es la tensión en física?",
-                answers: [
-                    { text: "La fuerza por unidad de área aplicada sobre un objeto.", correct: true },
-                    { text: "La resistencia de un material a la deformación.", correct: false },
-                    { text: "La velocidad de un objeto en movimiento.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es la deformación?",
-                answers: [
-                    { text: "El cambio en la forma o tamaño de un objeto debido a una fuerza aplicada.", correct: true },
-                    { text: "La velocidad de un objeto en movimiento.", correct: false },
-                    { text: "La resistencia de un objeto a cambiar su estado de movimiento.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es el esfuerzo cortante?",
-                answers: [
-                    { text: "Una fuerza que causa deformación por deslizamiento en un objeto.", correct: true },
-                    { text: "Una fuerza que causa compresión en un objeto.", correct: false },
-                    { text: "Una fuerza que causa tensión en un objeto.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es la presión en física?",
-                answers: [
-                    { text: "La fuerza aplicada por unidad de área.", correct: true },
-                    { text: "La fuerza de fricción en un objeto.", correct: false },
-                    { text: "La energía cinética de un objeto en movimiento.", correct: false }
-                ]
-            }
-        ];
+</div>
 
-        let attempt = 0;
-        const maxAttempts = 3;
+<div class="container" id="evaluation" style="display:none;">
+    <h1>Unidad 3: Estática y Dinámica</h1>
+    <div id="timer">Tiempo restante: 30:00</div>
 
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
+    <!-- Indicador 3.1 -->
+    <h2>Indicador 3.1: Leyes del movimiento de Newton</h2>
+    <div class="question">
+        <label>1. ¿Qué establece la primera ley de Newton sobre el movimiento de un objeto en reposo?</label>
+        <div class="options">
+            <label><input type="radio" name="q1" value="correcto" required> A. Permanece en reposo a menos que una fuerza externa actúe sobre él.</label><br>
+            <label><input type="radio" name="q1" value="incorrecto" required> B. Comienza a moverse por sí solo.</label><br>
+            <label><input type="radio" name="q1" value="incorrecto" required> C. Acelera constantemente.</label><br>
+            <label><input type="radio" name="q1" value="incorrecto" required> D. Se mueve en línea recta con velocidad constante.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>2. Según la segunda ley de Newton, ¿cómo se relaciona la fuerza con la aceleración y la masa?</label>
+        <div class="options">
+            <label><input type="radio" name="q2" value="correcto" required> A. La fuerza es directamente proporcional a la aceleración e inversamente proporcional a la masa.</label><br>
+            <label><input type="radio" name="q2" value="incorrecto" required> B. La fuerza es inversamente proporcional a la aceleración y directamente proporcional a la masa.</label><br>
+            <label><input type="radio" name="q2" value="incorrecto" required> C. La fuerza es igual a la aceleración menos la masa.</label><br>
+            <label><input type="radio" name="q2" value="incorrecto" required> D. La fuerza no está relacionada con la aceleración ni la masa.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>3. ¿Qué describe la tercera ley de Newton?</label>
+        <div class="options">
+            <label><input type="radio" name="q3" value="correcto" required> A. A cada acción corresponde una reacción igual y opuesta.</label><br>
+            <label><input type="radio" name="q3" value="incorrecto" required> B. La fuerza es igual a la masa por la aceleración.</label><br>
+            <label><input type="radio" name="q3" value="incorrecto" required> C. Los cuerpos en movimiento permanecen en movimiento.</label><br>
+            <label><input type="radio" name="q3" value="incorrecto" required> D. La gravedad actúa sobre todos los objetos.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>4. ¿Cómo afecta la masa de un objeto su aceleración cuando se aplica la misma fuerza?</label>
+        <div class="options">
+            <label><input type="radio" name="q4" value="correcto" required> A. A mayor masa, menor aceleración.</label><br>
+            <label><input type="radio" name="q4" value="incorrecto" required> B. A mayor masa, mayor aceleración.</label><br>
+            <label><input type="radio" name="q4" value="incorrecto" required> C. La masa no afecta la aceleración.</label><br>
+            <label><input type="radio" name="q4" value="incorrecto" required> D. A mayor masa, la aceleración es infinita.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>5. Si un objeto está en reposo y la fuerza neta que actúa sobre él es cero, ¿qué sucede con el objeto?</label>
+        <div class="options">
+            <label><input type="radio" name="q5" value="correcto" required> A. Permanece en reposo.</label><br>
+            <label><input type="radio" name="q5" value="incorrecto" required> B. Comienza a moverse hacia la derecha.</label><br>
+            <label><input type="radio" name="q5" value="incorrecto" required> C. Acelera hacia la izquierda.</label><br>
+            <label><input type="radio" name="q5" value="incorrecto" required> D. Se desplaza hacia arriba.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>6. ¿Qué sucede con la velocidad de un objeto en movimiento si la fuerza neta que actúa sobre él es cero?</label>
+        <div class="options">
+            <label><input type="radio" name="q6" value="correcto" required> A. Permanece constante.</label><br>
+            <label><input type="radio" name="q6" value="incorrecto" required> B. Aumenta.</label><br>
+            <label><input type="radio" name="q6" value="incorrecto" required> C. Disminuye.</label><br>
+            <label><input type="radio" name="q6" value="incorrecto" required> D. Se vuelve cero.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>7. Si un objeto de 5 kg es empujado con una fuerza de 20 N, ¿cuál es su aceleración?</label>
+        <div class="options">
+            <label><input type="radio" name="q7" value="correcto" required> A. 4 m/s².</label><br>
+            <label><input type="radio" name="q7" value="incorrecto" required> B. 5 m/s².</label><br>
+            <label><input type="radio" name="q7" value="incorrecto" required> C. 0.25 m/s².</label><br>
+            <label><input type="radio" name="q7" value="incorrecto" required> D. 100 m/s².</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>8. Un auto en movimiento constante está en equilibrio. ¿Qué podemos decir sobre las fuerzas que actúan sobre él?</label>
+        <div class="options">
+            <label><input type="radio" name="q8" value="correcto" required> A. La suma de las fuerzas es cero.</label><br>
+            <label><input type="radio" name="q8" value="incorrecto" required> B. Hay una fuerza neta actuando en la dirección del movimiento.</label><br>
+            <label><input type="radio" name="q8" value="incorrecto" required> C. Solo la gravedad actúa sobre él.</label><br>
+            <label><input type="radio" name="q8" value="incorrecto" required> D. La fuerza de fricción es mayor que la fuerza motriz.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>9. ¿Qué sucede con un objeto si las fuerzas que actúan sobre él están en equilibrio?</label>
+        <div class="options">
+            <label><input type="radio" name="q9" value="correcto" required> A. Permanece en reposo o se mueve con velocidad constante.</label><br>
+            <label><input type="radio" name="q9" value="incorrecto" required> B. Aumenta su velocidad.</label><br>
+            <label><input type="radio" name="q9" value="incorrecto" required> C. Disminuye su velocidad.</label><br>
+            <label><input type="radio" name="q9" value="incorrecto" required> D. Cambia de dirección.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>10. Un resorte se estira cuando se le aplica una fuerza. Según la tercera ley de Newton, ¿qué ocurre?</label>
+        <div class="options">
+            <label><input type="radio" name="q10" value="correcto" required> A. El resorte ejerce una fuerza igual y opuesta.</label><br>
+            <label><input type="radio" name="q10" value="incorrecto" required> B. El resorte deja de ejercer fuerza.</label><br>
+            <label><input type="radio" name="q10" value="incorrecto" required> C. El resorte se alarga indefinidamente.</label><br>
+            <label><input type="radio" name="q10" value="incorrecto" required> D. La fuerza ejercida por el resorte es menor que la aplicada.</label>
+        </div>
+    </div>
+
+    <!-- Indicador 3.2 -->
+    <h2>Indicador 3.2: Leyes del movimiento y equilibrio en un sistema de fuerzas</h2>
+    <div class="question">
+        <label>11. Un objeto se encuentra en equilibrio estático. ¿Qué se puede afirmar sobre las fuerzas que actúan sobre él?</label>
+        <div class="options">
+            <label><input type="radio" name="q11" value="correcto" required> A. La suma de todas las fuerzas es cero.</label><br>
+            <label><input type="radio" name="q11" value="incorrecto" required> B. Existe una fuerza neta en alguna dirección.</label><br>
+            <label><input type="radio" name="q11" value="incorrecto" required> C. Solo actúa la fuerza de gravedad.</label><br>
+            <label><input type="radio" name="q11" value="incorrecto" required> D. La fuerza de fricción es dominante.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>12. ¿Qué sucede con un objeto si las fuerzas que actúan sobre él no están en equilibrio?</label>
+        <div class="options">
+            <label><input type="radio" name="q12" value="correcto" required> A. Acelera en la dirección de la fuerza neta.</label><br>
+            <label><input type="radio" name="q12" value="incorrecto" required> B. Permanece en reposo.</label><br>
+            <label><input type="radio" name="q12" value="incorrecto" required> C. Mantiene su velocidad constante.</label><br>
+            <label><input type="radio" name="q12" value="incorrecto" required> D. Se mueve en la dirección opuesta a la fuerza neta.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>13. Un objeto se desliza sobre una superficie horizontal con una fuerza neta hacia la derecha. ¿Qué le ocurre?</label>
+        <div class="options">
+            <label><input type="radio" name="q13" value="correcto" required> A. Acelera hacia la derecha.</label><br>
+            <label><input type="radio" name="q13" value="incorrecto" required> B. Permanece en reposo.</label><br>
+            <label><input type="radio" name="q13" value="incorrecto" required> C. Se mueve hacia la izquierda.</label><br>
+            <label><input type="radio" name="q13" value="incorrecto" required> D. Se detiene.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>14. Si se aplican fuerzas iguales y opuestas a ambos extremos de un objeto, ¿qué sucede?</label>
+        <div class="options">
+            <label><input type="radio" name="q14" value="correcto" required> A. El objeto no se mueve.</label><br>
+            <label><input type="radio" name="q14" value="incorrecto" required> B. El objeto se acelera en una dirección.</label><br>
+            <label><input type="radio" name="q14" value="incorrecto" required> C. El objeto rota sobre su centro.</label><br>
+            <label><input type="radio" name="q14" value="incorrecto" required> D. El objeto se estira indefinidamente.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>15. Un objeto está en reposo sobre una superficie inclinada. ¿Qué fuerza evita que se deslice?</label>
+        <div class="options">
+            <label><input type="radio" name="q15" value="correcto" required> A. Fuerza de fricción.</label><br>
+            <label><input type="radio" name="q15" value="incorrecto" required> B. Fuerza normal.</label><br>
+            <label><input type="radio" name="q15" value="incorrecto" required> C. Fuerza gravitatoria.</label><br>
+            <label><input type="radio" name="q15" value="incorrecto" required> D. Fuerza centrífuga.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>16. Un objeto en equilibrio rotacional tiene un momento neto igual a:</label>
+        <div class="options">
+            <label><input type="radio" name="q16" value="correcto" required> A. Cero.</label><br>
+            <label><input type="radio" name="q16" value="incorrecto" required> B. Positivo.</label><br>
+            <label><input type="radio" name="q16" value="incorrecto" required> C. Negativo.</label><br>
+            <label><input type="radio" name="q16" value="incorrecto" required> D. Infinito.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>17. ¿Qué sucede si la fuerza neta que actúa sobre un objeto es diferente de cero?</label>
+        <div class="options">
+            <label><input type="radio" name="q17" value="correcto" required> A. El objeto acelera en la dirección de la fuerza neta.</label><br>
+            <label><input type="radio" name="q17" value="incorrecto" required> B. El objeto se mantiene en reposo.</label><br>
+            <label><input type="radio" name="q17" value="incorrecto" required> C. El objeto se mueve con velocidad constante.</label><br>
+            <label><input type="radio" name="q17" value="incorrecto" required> D. El objeto se desplaza en dirección opuesta a la fuerza neta.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>18. Si un objeto tiene un equilibrio inestable, ¿qué sucede si se aplica una pequeña fuerza?</label>
+        <div class="options">
+            <label><input type="radio" name="q18" value="correcto" required> A. El objeto pierde su equilibrio y se mueve.</label><br>
+            <label><input type="radio" name="q18" value="incorrecto" required> B. El objeto retorna a su posición original.</label><br>
+            <label><input type="radio" name="q18" value="incorrecto" required> C. El objeto se mantiene en equilibrio.</label><br>
+            <label><input type="radio" name="q18" value="incorrecto" required> D. El objeto gira sobre su eje.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>19. ¿Qué se puede afirmar de un sistema de fuerzas en equilibrio?</label>
+        <div class="options">
+            <label><input type="radio" name="q19" value="correcto" required> A. La suma de las fuerzas y la suma de los momentos es cero.</label><br>
+            <label><input type="radio" name="q19" value="incorrecto" required> B. La suma de las fuerzas es cero pero los momentos no.</label><br>
+            <label><input type="radio" name="q19" value="incorrecto" required> C. Los momentos son cero pero la suma de las fuerzas no.</label><br>
+            <label><input type="radio" name="q19" value="incorrecto" required> D. Las fuerzas y los momentos son positivos.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>20. Un objeto en equilibrio estático está siendo empujado por dos fuerzas opuestas. ¿Qué se puede decir sobre estas fuerzas?</label>
+        <div class="options">
+            <label><input type="radio" name="q20" value="correcto" required> A. Son iguales en magnitud y opuestas en dirección.</label><br>
+            <label><input type="radio" name="q20" value="incorrecto" required> B. Son iguales en magnitud y en dirección.</label><br>
+            <label><input type="radio" name="q20" value="incorrecto" required> C. Son diferentes en magnitud pero opuestas en dirección.</label><br>
+            <label><input type="radio" name="q20" value="incorrecto" required> D. Son diferentes en magnitud y en dirección.</label>
+        </div>
+    </div>
+
+    <!-- Indicador 3.3 -->
+    <h2>Indicador 3.3: Trabajo realizado por una fuerza</h2>
+    <div class="question">
+        <label>21. ¿Qué es el trabajo realizado por una fuerza?</label>
+        <div class="options">
+            <label><input type="radio" name="q21" value="correcto" required> A. Es el producto de la fuerza por la distancia en la dirección de la fuerza.</label><br>
+            <label><input type="radio" name="q21" value="incorrecto" required> B. Es la fuerza aplicada en un objeto sin que haya desplazamiento.</label><br>
+            <label><input type="radio" name="q21" value="incorrecto" required> C. Es la fuerza aplicada por unidad de tiempo.</label><br>
+            <label><input type="radio" name="q21" value="incorrecto" required> D. Es el cambio en la velocidad de un objeto.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>22. ¿Qué ocurre con el trabajo realizado si la fuerza y el desplazamiento son perpendiculares entre sí?</label>
+        <div class="options">
+            <label><input type="radio" name="q22" value="correcto" required> A. El trabajo es cero.</label><br>
+            <label><input type="radio" name="q22" value="incorrecto" required> B. El trabajo es máximo.</label><br>
+            <label><input type="radio" name="q22" value="incorrecto" required> C. El trabajo es negativo.</label><br>
+            <label><input type="radio" name="q22" value="incorrecto" required> D. El trabajo es positivo.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>23. ¿Qué factor no afecta el trabajo realizado por una fuerza constante?</label>
+        <div class="options">
+            <label><input type="radio" name="q23" value="correcto" required> A. El tiempo durante el cual se aplica la fuerza.</label><br>
+            <label><input type="radio" name="q23" value="incorrecto" required> B. La magnitud de la fuerza.</label><br>
+            <label><input type="radio" name="q23" value="incorrecto" required> C. La distancia recorrida por el objeto.</label><br>
+            <label><input type="radio" name="q23" value="incorrecto" required> D. El ángulo entre la fuerza y el desplazamiento.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>24. Un objeto se mueve en línea recta mientras una fuerza constante actúa en la misma dirección. ¿Cómo se calcula el trabajo realizado?</label>
+        <div class="options">
+            <label><input type="radio" name="q24" value="correcto" required> A. Multiplicando la magnitud de la fuerza por la distancia recorrida.</label><br>
+            <label><input type="radio" name="q24" value="incorrecto" required> B. Dividiendo la magnitud de la fuerza por la distancia recorrida.</label><br>
+            <label><input type="radio" name="q24" value="incorrecto" required> C. Sumando la magnitud de la fuerza a la distancia recorrida.</label><br>
+            <label><input type="radio" name="q24" value="incorrecto" required> D. Restando la magnitud de la fuerza de la distancia recorrida.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>25. Si una fuerza constante se aplica a un objeto pero no hay desplazamiento, ¿qué se puede decir sobre el trabajo realizado?</label>
+        <div class="options">
+            <label><input type="radio" name="q25" value="correcto" required> A. El trabajo es cero.</label><br>
+            <label><input type="radio" name="q25" value="incorrecto" required> B. El trabajo es positivo.</label><br>
+            <label><input type="radio" name="q25" value="incorrecto" required> C. El trabajo es negativo.</label><br>
+            <label><input type="radio" name="q25" value="incorrecto" required> D. El trabajo es infinito.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>26. ¿Qué sucede con el trabajo realizado por una fuerza si el desplazamiento es en la dirección opuesta a la fuerza?</label>
+        <div class="options">
+            <label><input type="radio" name="q26" value="correcto" required> A. El trabajo es negativo.</label><br>
+            <label><input type="radio" name="q26" value="incorrecto" required> B. El trabajo es positivo.</label><br>
+            <label><input type="radio" name="q26" value="incorrecto" required> C. El trabajo es cero.</label><br>
+            <label><input type="radio" name="q26" value="incorrecto" required> D. El trabajo es infinito.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>27. Si una fuerza actúa a 45° respecto a la dirección de desplazamiento, ¿cómo afecta esto al trabajo realizado?</label>
+        <div class="options">
+            <label><input type="radio" name="q27" value="correcto" required> A. El trabajo realizado es menor que si la fuerza estuviera alineada con el desplazamiento.</label><br>
+            <label><input type="radio" name="q27" value="incorrecto" required> B. El trabajo realizado es mayor que si la fuerza estuviera alineada con el desplazamiento.</label><br>
+            <label><input type="radio" name="q27" value="incorrecto" required> C. El trabajo realizado es el mismo sin importar el ángulo.</label><br>
+            <label><input type="radio" name="q27" value="incorrecto" required> D. El trabajo realizado es infinito.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>28. ¿Qué ocurre con el trabajo realizado por una fuerza si el objeto sobre el que actúa no se desplaza?</label>
+        <div class="options">
+            <label><input type="radio" name="q28" value="correcto" required> A. El trabajo es cero.</label><br>
+            <label><input type="radio" name="q28" value="incorrecto" required> B. El trabajo es positivo.</label><br>
+            <label><input type="radio" name="q28" value="incorrecto" required> C. El trabajo es negativo.</label><br>
+            <label><input type="radio" name="q28" value="incorrecto" required> D. El trabajo es infinito.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>29. Si una fuerza constante actúa sobre un objeto, pero el ángulo entre la fuerza y el desplazamiento aumenta, ¿qué ocurre con el trabajo realizado?</label>
+        <div class="options">
+            <label><input type="radio" name="q29" value="correcto" required> A. Disminuye.</label><br>
+            <label><input type="radio" name="q29" value="incorrecto" required> B. Aumenta.</label><br>
+            <label><input type="radio" name="q29" value="incorrecto" required> C. Permanece constante.</label><br>
+            <label><input type="radio" name="q29" value="incorrecto" required> D. Se vuelve cero.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>30. Si un objeto se mueve en la dirección de una fuerza aplicada, ¿qué se puede decir del trabajo realizado?</label>
+        <div class="options">
+            <label><input type="radio" name="q30" value="correcto" required> A. Es positivo.</label><br>
+            <label><input type="radio" name="q30" value="incorrecto" required> B. Es negativo.</label><br>
+            <label><input type="radio" name="q30" value="incorrecto" required> C. Es cero.</label><br>
+            <label><input type="radio" name="q30" value="incorrecto" required> D. Es infinito.</label>
+        </div>
+    </div>
+
+    <!-- Indicador 3.4 -->
+    <h2>Indicador 3.4: Trabajo y potencia</h2>
+    <div class="question">
+        <label>31. ¿Cómo se define la potencia en física?</label>
+        <div class="options">
+            <label><input type="radio" name="q31" value="correcto" required> A. Como el trabajo realizado por unidad de tiempo.</label><br>
+            <label><input type="radio" name="q31" value="incorrecto" required> B. Como la fuerza aplicada por unidad de tiempo.</label><br>
+            <label><input type="radio" name="q31" value="incorrecto" required> C. Como la distancia recorrida por unidad de tiempo.</label><br>
+            <label><input type="radio" name="q31" value="incorrecto" required> D. Como el cambio en la energía potencial por unidad de tiempo.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>32. Un motor realiza 500 J de trabajo en 5 segundos. ¿Cuál es la potencia desarrollada?</label>
+        <div class="options">
+            <label><input type="radio" name="q32" value="correcto" required> A. 100 W.</label><br>
+            <label><input type="radio" name="q32" value="incorrecto" required> B. 500 W.</label><br>
+            <label><input type="radio" name="q32" value="incorrecto" required> C. 5 W.</label><br>
+            <label><input type="radio" name="q32" value="incorrecto" required> D. 2500 W.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>33. ¿Qué ocurre con la potencia si el trabajo realizado permanece constante pero el tiempo disminuye?</label>
+        <div class="options">
+            <label><input type="radio" name="q33" value="correcto" required> A. La potencia aumenta.</label><br>
+            <label><input type="radio" name="q33" value="incorrecto" required> B. La potencia disminuye.</label><br>
+            <label><input type="radio" name="q33" value="incorrecto" required> C. La potencia permanece constante.</label><br>
+            <label><input type="radio" name="q33" value="incorrecto" required> D. La potencia es cero.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>34. Si un trabajo de 1000 J se realiza en 10 segundos, ¿cuál es la potencia desarrollada?</label>
+        <div class="options">
+            <label><input type="radio" name="q34" value="correcto" required> A. 100 W.</label><br>
+            <label><input type="radio" name="q34" value="incorrecto" required> B. 10 W.</label><br>
+            <label><input type="radio" name="q34" value="incorrecto" required> C. 1000 W.</label><br>
+            <label><input type="radio" name="q34" value="incorrecto" required> D. 0 W.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>35. Si dos máquinas realizan la misma cantidad de trabajo, pero una lo hace en menos tiempo, ¿qué se puede afirmar?</label>
+        <div class="options">
+            <label><input type="radio" name="q35" value="correcto" required> A. La máquina que lo realiza en menos tiempo tiene mayor potencia.</label><br>
+            <label><input type="radio" name="q35" value="incorrecto" required> B. Ambas máquinas tienen la misma potencia.</label><br>
+            <label><input type="radio" name="q35" value="incorrecto" required> C. La máquina que lo realiza en más tiempo tiene mayor potencia.</label><br>
+            <label><input type="radio" name="q35" value="incorrecto" required> D. Ninguna de las anteriores.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>36. Si la potencia desarrollada por una máquina es constante, ¿qué ocurre si el trabajo realizado aumenta?</label>
+        <div class="options">
+            <label><input type="radio" name="q36" value="correcto" required> A. El tiempo necesario para realizar el trabajo aumenta.</label><br>
+            <label><input type="radio" name="q36" value="incorrecto" required> B. El tiempo necesario para realizar el trabajo disminuye.</label><br>
+            <label><input type="radio" name="q36" value="incorrecto" required> C. La potencia disminuye.</label><br>
+            <label><input type="radio" name="q36" value="incorrecto" required> D. La potencia aumenta.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>37. Si una máquina realiza un trabajo de 400 J en 8 segundos, ¿cuál es la potencia desarrollada?</label>
+        <div class="options">
+            <label><input type="radio" name="q37" value="correcto" required> A. 50 W.</label><br>
+            <label><input type="radio" name="q37" value="incorrecto" required> B. 400 W.</label><br>
+            <label><input type="radio" name="q37" value="incorrecto" required> C. 8 W.</label><br>
+            <label><input type="radio" name="q37" value="incorrecto" required> D. 3200 W.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>38. Un motor desarrolla una potencia de 200 W y realiza un trabajo de 800 J. ¿Cuánto tiempo tarda en realizarlo?</label>
+        <div class="options">
+            <label><input type="radio" name="q38" value="correcto" required> A. 4 segundos.</label><br>
+            <label><input type="radio" name="q38" value="incorrecto" required> B. 2 segundos.</label><br>
+            <label><input type="radio" name="q38" value="incorrecto" required> C. 200 segundos.</label><br>
+            <label><input type="radio" name="q38" value="incorrecto" required> D. 800 segundos.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>39. Si una máquina realiza un trabajo en menos tiempo que otra, ¿qué podemos afirmar sobre la potencia de ambas máquinas?</label>
+        <div class="options">
+            <label><input type="radio" name="q39" value="correcto" required> A. La máquina que realiza el trabajo en menos tiempo tiene mayor potencia.</label><br>
+            <label><input type="radio" name="q39" value="incorrecto" required> B. Ambas máquinas tienen la misma potencia.</label><br>
+            <label><input type="radio" name="q39" value="incorrecto" required> C. La máquina que realiza el trabajo en más tiempo tiene mayor potencia.</label><br>
+            <label><input type="radio" name="q39" value="incorrecto" required> D. Ninguna de las anteriores.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>40. Si un motor realiza un trabajo de 1000 J en 20 segundos, ¿cuál es la potencia desarrollada?</label>
+        <div class="options">
+            <label><input type="radio" name="q40" value="correcto" required> A. 50 W.</label><br>
+            <label><input type="radio" name="q40" value="incorrecto" required> B. 1000 W.</label><br>
+            <label><input type="radio" name="q40" value="incorrecto" required> C. 20 W.</label><br>
+            <label><input type="radio" name="q40" value="incorrecto" required> D. 500 W.</label>
+        </div>
+    </div>
+
+    <!-- Indicador 3.5 -->
+    <h2>Indicador 3.5: Energía mecánica total</h2>
+    <div class="question">
+        <label>41. ¿Cómo se define la energía mecánica total de un sistema?</label>
+        <div class="options">
+            <label><input type="radio" name="q41" value="correcto" required> A. Es la suma de la energía cinética y la energía potencial.</label><br>
+            <label><input type="radio" name="q41" value="incorrecto" required> B. Es el producto de la energía cinética y la energía potencial.</label><br>
+            <label><input type="radio" name="q41" value="incorrecto" required> C. Es la diferencia entre la energía cinética y la energía potencial.</label><br>
+            <label><input type="radio" name="q41" value="incorrecto" required> D. Es la energía cinética dividida por la energía potencial.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>42. ¿Qué sucede con la energía mecánica total si no hay fuerzas externas actuando sobre un sistema?</label>
+        <div class="options">
+            <label><input type="radio" name="q42" value="correcto" required> A. Permanece constante.</label><br>
+            <label><input type="radio" name="q42" value="incorrecto" required> B. Aumenta.</label><br>
+            <label><input type="radio" name="q42" value="incorrecto" required> C. Disminuye.</label><br>
+            <label><input type="radio" name="q42" value="incorrecto" required> D. Se convierte en energía térmica.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>43. Un objeto se mueve desde una altura h hasta el suelo. ¿Cómo cambia su energía potencial?</label>
+        <div class="options">
+            <label><input type="radio" name="q43" value="correcto" required> A. Disminuye.</label><br>
+            <label><input type="radio" name="q43" value="incorrecto" required> B. Aumenta.</label><br>
+            <label><input type="radio" name="q43" value="incorrecto" required> C. Permanece constante.</label><br>
+            <label><input type="radio" name="q43" value="incorrecto" required> D. Se convierte en energía cinética.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>44. ¿Qué tipo de energía tiene un objeto en movimiento?</label>
+        <div class="options">
+            <label><input type="radio" name="q44" value="correcto" required> A. Energía cinética.</label><br>
+            <label><input type="radio" name="q44" value="incorrecto" required> B. Energía potencial.</label><br>
+            <label><input type="radio" name="q44" value="incorrecto" required> C. Energía térmica.</label><br>
+            <label><input type="radio" name="q44" value="incorrecto" required> D. Energía gravitacional.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>45. Si un objeto en movimiento se detiene, ¿qué ocurre con su energía cinética?</label>
+        <div class="options">
+            <label><input type="radio" name="q45" value="correcto" required> A. Se convierte en otro tipo de energía, como la energía térmica.</label><br>
+            <label><input type="radio" name="q45" value="incorrecto" required> B. Aumenta.</label><br>
+            <label><input type="radio" name="q45" value="incorrecto" required> C. Permanece constante.</label><br>
+            <label><input type="radio" name="q45" value="incorrecto" required> D. Desaparece completamente.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>46. ¿Qué ocurre con la energía potencial gravitacional de un objeto que cae libremente?</label>
+        <div class="options">
+            <label><input type="radio" name="q46" value="correcto" required> A. Se convierte en energía cinética.</label><br>
+            <label><input type="radio" name="q46" value="incorrecto" required> B. Aumenta.</label><br>
+            <label><input type="radio" name="q46" value="incorrecto" required> C. Permanece constante.</label><br>
+            <label><input type="radio" name="q46" value="incorrecto" required> D. Se convierte en energía térmica.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>47. Un objeto está en el punto más alto de su trayectoria. ¿Qué podemos decir de su energía cinética?</label>
+        <div class="options">
+            <label><input type="radio" name="q47" value="correcto" required> A. Es mínima.</label><br>
+            <label><input type="radio" name="q47" value="incorrecto" required> B. Es máxima.</label><br>
+            <label><input type="radio" name="q47" value="incorrecto" required> C. Es igual a la energía potencial.</label><br>
+            <label><input type="radio" name="q47" value="incorrecto" required> D. Es igual a la energía total.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>48. Si la energía cinética de un objeto aumenta, ¿qué ocurre con su energía potencial?</label>
+        <div class="options">
+            <label><input type="radio" name="q48" value="correcto" required> A. Disminuye.</label><br>
+            <label><input type="radio" name="q48" value="incorrecto" required> B. Aumenta.</label><br>
+            <label><input type="radio" name="q48" value="incorrecto" required> C. Permanece constante.</label><br>
+            <label><input type="radio" name="q48" value="incorrecto" required> D. Desaparece.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>49. Si un objeto en movimiento aumenta su velocidad, ¿qué ocurre con su energía cinética?</label>
+        <div class="options">
+            <label><input type="radio" name="q49" value="correcto" required> A. Aumenta.</label><br>
+            <label><input type="radio" name="q49" value="incorrecto" required> B. Disminuye.</label><br>
+            <label><input type="radio" name="q49" value="incorrecto" required> C. Permanece constante.</label><br>
+            <label><input type="radio" name="q49" value="incorrecto" required> D. Desaparece.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>50. ¿Qué podemos decir de la energía total en un sistema cerrado donde no actúan fuerzas externas?</label>
+        <div class="options">
+            <label><input type="radio" name="q50" value="correcto" required> A. Permanece constante.</label><br>
+            <label><input type="radio" name="q50" value="incorrecto" required> B. Aumenta con el tiempo.</label><br>
+            <label><input type="radio" name="q50" value="incorrecto" required> C. Disminuye con el tiempo.</label><br>
+            <label><input type="radio" name="q50" value="incorrecto" required> D. Se convierte en energía térmica.</label>
+        </div>
+    </div>
+
+    <!-- Indicador 3.6 -->
+    <h2>Indicador 3.6: Energía potencial gravitatoria y energía potencial elástica</h2>
+    <div class="question">
+        <label>51. ¿Qué es la energía potencial gravitatoria?</label>
+        <div class="options">
+            <label><input type="radio" name="q51" value="correcto" required> A. Es la energía que tiene un objeto debido a su posición en un campo gravitatorio.</label><br>
+            <label><input type="radio" name="q51" value="incorrecto" required> B. Es la energía que tiene un objeto debido a su movimiento.</label><br>
+            <label><input type="radio" name="q51" value="incorrecto" required> C. Es la energía que tiene un objeto debido a su temperatura.</label><br>
+            <label><input type="radio" name="q51" value="incorrecto" required> D. Es la energía que tiene un objeto debido a su velocidad.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>52. ¿Cómo se calcula la energía potencial gravitatoria de un objeto?</label>
+        <div class="options">
+            <label><input type="radio" name="q52" value="correcto" required> A. Multiplicando su masa, la gravedad y la altura.</label><br>
+            <label><input type="radio" name="q52" value="incorrecto" required> B. Multiplicando su velocidad, la gravedad y la altura.</label><br>
+            <label><input type="radio" name="q52" value="incorrecto" required> C. Multiplicando su masa, la velocidad y la altura.</label><br>
+            <label><input type="radio" name="q52" value="incorrecto" required> D. Multiplicando su energía cinética por la altura.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>53. ¿Qué es la energía potencial elástica?</label>
+        <div class="options">
+            <label><input type="radio" name="q53" value="correcto" required> A. Es la energía almacenada en un objeto que ha sido estirado o comprimido.</label><br>
+            <label><input type="radio" name="q53" value="incorrecto" required> B. Es la energía que tiene un objeto debido a su movimiento.</label><br>
+            <label><input type="radio" name="q53" value="incorrecto" required> C. Es la energía que tiene un objeto debido a su posición en un campo gravitatorio.</label><br>
+            <label><input type="radio" name="q53" value="incorrecto" required> D. Es la energía que tiene un objeto debido a su temperatura.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>54. ¿Cómo se calcula la energía potencial elástica en un resorte?</label>
+        <div class="options">
+            <label><input type="radio" name="q54" value="correcto" required> A. Usando la fórmula 1/2 k x², donde k es la constante del resorte y x es la deformación.</label><br>
+            <label><input type="radio" name="q54" value="incorrecto" required> B. Usando la fórmula k x, donde k es la constante del resorte y x es la deformación.</label><br>
+            <label><input type="radio" name="q54" value="incorrecto" required> C. Usando la fórmula m g h, donde m es la masa, g es la gravedad y h es la altura.</label><br>
+            <label><input type="radio" name="q54" value="incorrecto" required> D. Usando la fórmula 1/2 m v², donde m es la masa y v es la velocidad.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>55. Si un resorte se estira el doble, ¿qué ocurre con su energía potencial elástica?</label>
+        <div class="options">
+            <label><input type="radio" name="q55" value="correcto" required> A. Se cuadruplica.</label><br>
+            <label><input type="radio" name="q55" value="incorrecto" required> B. Se duplica.</label><br>
+            <label><input type="radio" name="q55" value="incorrecto" required> C. Permanece constante.</label><br>
+            <label><input type="radio" name="q55" value="incorrecto" required> D. Disminuye a la mitad.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>56. ¿Qué tipo de energía tiene un resorte cuando está comprimido o estirado?</label>
+        <div class="options">
+            <label><input type="radio" name="q56" value="correcto" required> A. Energía potencial elástica.</label><br>
+            <label><input type="radio" name="q56" value="incorrecto" required> B. Energía cinética.</label><br>
+            <label><input type="radio" name="q56" value="incorrecto" required> C. Energía potencial gravitatoria.</label><br>
+            <label><input type="radio" name="q56" value="incorrecto" required> D. Energía térmica.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>57. Si un objeto es levantado a una altura mayor, ¿qué ocurre con su energía potencial gravitatoria?</label>
+        <div class="options">
+            <label><input type="radio" name="q57" value="correcto" required> A. Aumenta.</label><br>
+            <label><input type="radio" name="q57" value="incorrecto" required> B. Disminuye.</label><br>
+            <label><input type="radio" name="q57" value="incorrecto" required> C. Permanece constante.</label><br>
+            <label><input type="radio" name="q57" value="incorrecto" required> D. Se convierte en energía cinética.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>58. Un resorte se estira y acumula energía. ¿Cómo se denomina esta energía?</label>
+        <div class="options">
+            <label><input type="radio" name="q58" value="correcto" required> A. Energía potencial elástica.</label><br>
+            <label><input type="radio" name="q58" value="incorrecto" required> B. Energía cinética.</label><br>
+            <label><input type="radio" name="q58" value="incorrecto" required> C. Energía potencial gravitatoria.</label><br>
+            <label><input type="radio" name="q58" value="incorrecto" required> D. Energía térmica.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>59. Si un objeto desciende desde una altura, ¿qué ocurre con su energía potencial gravitatoria?</label>
+        <div class="options">
+            <label><input type="radio" name="q59" value="correcto" required> A. Disminuye.</label><br>
+            <label><input type="radio" name="q59" value="incorrecto" required> B. Aumenta.</label><br>
+            <label><input type="radio" name="q59" value="incorrecto" required> C. Permanece constante.</label><br>
+            <label><input type="radio" name="q59" value="incorrecto" required> D. Se convierte en energía térmica.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>60. ¿Qué ocurre con la energía potencial elástica de un resorte si se estira más allá de su límite elástico?</label>
+        <div class="options">
+            <label><input type="radio" name="q60" value="correcto" required> A. El resorte no recupera su energía potencial y puede deformarse permanentemente.</label><br>
+            <label><input type="radio" name="q60" value="incorrecto" required> B. La energía potencial elástica se convierte en energía cinética.</label><br>
+            <label><input type="radio" name="q60" value="incorrecto" required> C. La energía potencial elástica se convierte en energía térmica.</label><br>
+            <label><input type="radio" name="q60" value="incorrecto" required> D. El resorte sigue acumulando energía sin límite.</label>
+        </div>
+    </div>
+
+    <!-- Indicador 3.7 -->
+    <h2>Indicador 3.7: Ley de Hooke y resortes</h2>
+    <div class="question">
+        <label>61. ¿Qué establece la ley de Hooke sobre un resorte?</label>
+        <div class="options">
+            <label><input type="radio" name="q61" value="correcto" required> A. La fuerza que se necesita para estirar o comprimir un resorte es directamente proporcional a su deformación.</label><br>
+            <label><input type="radio" name="q61" value="incorrecto" required> B. La fuerza que se necesita para estirar o comprimir un resorte es inversamente proporcional a su deformación.</label><br>
+            <label><input type="radio" name="q61" value="incorrecto" required> C. La fuerza que se necesita para estirar o comprimir un resorte no depende de su deformación.</label><br>
+            <label><input type="radio" name="q61" value="incorrecto" required> D. La ley de Hooke solo aplica cuando el resorte está en reposo.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>62. ¿Cómo se calcula la constante de un resorte usando la ley de Hooke?</label>
+        <div class="options">
+            <label><input type="radio" name="q62" value="correcto" required> A. Dividiendo la fuerza aplicada por la deformación del resorte.</label><br>
+            <label><input type="radio" name="q62" value="incorrecto" required> B. Multiplicando la fuerza aplicada por la deformación del resorte.</label><br>
+            <label><input type="radio" name="q62" value="incorrecto" required> C. Sumando la fuerza aplicada y la deformación del resorte.</label><br>
+            <label><input type="radio" name="q62" value="incorrecto" required> D. Restando la fuerza aplicada de la deformación del resorte.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>63. Un resorte tiene una constante de 100 N/m. ¿Cuánta fuerza se necesita para estirarlo 0.5 m?</label>
+        <div class="options">
+            <label><input type="radio" name="q63" value="correcto" required> A. 50 N.</label><br>
+            <label><input type="radio" name="q63" value="incorrecto" required> B. 100 N.</label><br>
+            <label><input type="radio" name="q63" value="incorrecto" required> C. 150 N.</label><br>
+            <label><input type="radio" name="q63" value="incorrecto" required> D. 200 N.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>64. Si un resorte se comprime 0.2 m con una fuerza de 10 N, ¿cuál es la constante del resorte?</label>
+        <div class="options">
+            <label><input type="radio" name="q64" value="correcto" required> A. 50 N/m.</label><br>
+            <label><input type="radio" name="q64" value="incorrecto" required> B. 20 N/m.</label><br>
+            <label><input type="radio" name="q64" value="incorrecto" required> C. 100 N/m.</label><br>
+            <label><input type="radio" name="q64" value="incorrecto" required> D. 5 N/m.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>65. ¿Qué sucede si un resorte se estira más allá de su límite elástico según la ley de Hooke?</label>
+        <div class="options">
+            <label><input type="radio" name="q65" value="correcto" required> A. Deja de seguir la ley de Hooke y puede sufrir una deformación permanente.</label><br>
+            <label><input type="radio" name="q65" value="incorrecto" required> B. Continúa siguiendo la ley de Hooke indefinidamente.</label><br>
+            <label><input type="radio" name="q65" value="incorrecto" required> C. Se convierte en un resorte más fuerte.</label><br>
+            <label><input type="radio" name="q65" value="incorrecto" required> D. Su constante de resorte se vuelve negativa.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>66. ¿Cómo afecta la constante de un resorte a la cantidad de energía que puede almacenar?</label>
+        <div class="options">
+            <label><input type="radio" name="q66" value="correcto" required> A. Un resorte con una constante mayor almacena más energía para una misma deformación.</label><br>
+            <label><input type="radio" name="q66" value="incorrecto" required> B. Un resorte con una constante mayor almacena menos energía para una misma deformación.</label><br>
+            <label><input type="radio" name="q66" value="incorrecto" required> C. La constante del resorte no afecta la energía almacenada.</label><br>
+            <label><input type="radio" name="q66" value="incorrecto" required> D. Un resorte con una constante menor almacena más energía para una misma deformación.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>67. Un resorte se estira 0.1 m y almacena 5 J de energía. ¿Qué ocurre con la energía almacenada si se estira el doble?</label>
+        <div class="options">
+            <label><input type="radio" name="q67" value="correcto" required> A. La energía almacenada se cuadruplica.</label><br>
+            <label><input type="radio" name="q67" value="incorrecto" required> B. La energía almacenada se duplica.</label><br>
+            <label><input type="radio" name="q67" value="incorrecto" required> C. La energía almacenada permanece constante.</label><br>
+            <label><input type="radio" name="q67" value="incorrecto" required> D. La energía almacenada disminuye.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>68. Si la constante de un resorte es alta, ¿qué significa esto sobre la fuerza necesaria para deformarlo?</label>
+        <div class="options">
+            <label><input type="radio" name="q68" value="correcto" required> A. Se necesita una mayor fuerza para una misma deformación.</label><br>
+            <label><input type="radio" name="q68" value="incorrecto" required> B. Se necesita una menor fuerza para una misma deformación.</label><br>
+            <label><input type="radio" name="q68" value="incorrecto" required> C. La fuerza necesaria es independiente de la constante.</label><br>
+            <label><input type="radio" name="q68" value="incorrecto" required> D. La constante y la fuerza no están relacionadas.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>69. ¿Qué ocurre con un resorte si se somete repetidamente a fuerzas que superan su límite elástico?</label>
+        <div class="options">
+            <label><input type="radio" name="q69" value="correcto" required> A. Puede deformarse permanentemente y perder su elasticidad.</label><br>
+            <label><input type="radio" name="q69" value="incorrecto" required> B. Se vuelve más fuerte y resistente.</label><br>
+            <label><input type="radio" name="q69" value="incorrecto" required> C. Su constante de resorte aumenta.</label><br>
+            <label><input type="radio" name="q69" value="incorrecto" required> D. No ocurre nada, sigue funcionando como antes.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>70. Si un resorte tiene una constante de 200 N/m y se estira 0.3 m, ¿cuánta energía potencial elástica almacena?</label>
+        <div class="options">
+            <label><input type="radio" name="q70" value="correcto" required> A. 9 J.</label><br>
+            <label><input type="radio" name="q70" value="incorrecto" required> B. 18 J.</label><br>
+            <label><input type="radio" name="q70" value="incorrecto" required> C. 6 J.</label><br>
+            <label><input type="radio" name="q70" value="incorrecto" required> D. 12 J.</label>
+        </div>
+    </div>
+
+    <!-- Indicador 3.8 -->
+    <h2>Indicador 3.8: Momento lineal o ímpetu</h2>
+    <div class="question">
+        <label>71. ¿Qué es el momento lineal de un objeto?</label>
+        <div class="options">
+            <label><input type="radio" name="q71" value="correcto" required> A. Es el producto de la masa por la velocidad del objeto.</label><br>
+            <label><input type="radio" name="q71" value="incorrecto" required> B. Es la suma de la masa y la velocidad del objeto.</label><br>
+            <label><input type="radio" name="q71" value="incorrecto" required> C. Es la diferencia entre la masa y la velocidad del objeto.</label><br>
+            <label><input type="radio" name="q71" value="incorrecto" required> D. Es la masa dividida por la velocidad del objeto.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>72. ¿Qué ocurre con el momento lineal de un objeto si su velocidad se duplica?</label>
+        <div class="options">
+            <label><input type="radio" name="q72" value="correcto" required> A. También se duplica.</label><br>
+            <label><input type="radio" name="q72" value="incorrecto" required> B. Permanece constante.</label><br>
+            <label><input type="radio" name="q72" value="incorrecto" required> C. Disminuye.</label><br>
+            <label><input type="radio" name="q72" value="incorrecto" required> D. Se reduce a la mitad.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>73. Si dos objetos tienen la misma velocidad pero diferentes masas, ¿cuál tiene mayor momento lineal?</label>
+        <div class="options">
+            <label><input type="radio" name="q73" value="correcto" required> A. El objeto con mayor masa.</label><br>
+            <label><input type="radio" name="q73" value="incorrecto" required> B. El objeto con menor masa.</label><br>
+            <label><input type="radio" name="q73" value="incorrecto" required> C. Ambos tienen el mismo momento lineal.</label><br>
+            <label><input type="radio" name="q73" value="incorrecto" required> D. El momento lineal no depende de la masa.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>74. ¿Qué ocurre con el momento lineal de un objeto si su masa se reduce a la mitad pero mantiene la misma velocidad?</label>
+        <div class="options">
+            <label><input type="radio" name="q74" value="correcto" required> A. También se reduce a la mitad.</label><br>
+            <label><input type="radio" name="q74" value="incorrecto" required> B. Permanece constante.</label><br>
+            <label><input type="radio" name="q74" value="incorrecto" required> C. Se duplica.</label><br>
+            <label><input type="radio" name="q74" value="incorrecto" required> D. Disminuye a cero.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>75. Si un objeto en movimiento aumenta su masa pero mantiene la misma velocidad, ¿qué ocurre con su momento lineal?</label>
+        <div class="options">
+            <label><input type="radio" name="q75" value="correcto" required> A. Aumenta.</label><br>
+            <label><input type="radio" name="q75" value="incorrecto" required> B. Disminuye.</label><br>
+            <label><input type="radio" name="q75" value="incorrecto" required> C. Permanece constante.</label><br>
+            <label><input type="radio" name="q75" value="incorrecto" required> D. Se reduce a cero.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>76. ¿Qué podemos afirmar sobre el momento lineal en un sistema cerrado donde no actúan fuerzas externas?</label>
+        <div class="options">
+            <label><input type="radio" name="q76" value="correcto" required> A. Permanece constante.</label><br>
+            <label><input type="radio" name="q76" value="incorrecto" required> B. Aumenta con el tiempo.</label><br>
+            <label><input type="radio" name="q76" value="incorrecto" required> C. Disminuye con el tiempo.</label><br>
+            <label><input type="radio" name="q76" value="incorrecto" required> D. Se convierte en energía térmica.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>77. Si dos objetos en movimiento colisionan y se adhieren, ¿qué ocurre con su momento lineal total?</label>
+        <div class="options">
+            <label><input type="radio" name="q77" value="correcto" required> A. Permanece constante.</label><br>
+            <label><input type="radio" name="q77" value="incorrecto" required> B. Aumenta.</label><br>
+            <label><input type="radio" name="q77" value="incorrecto" required> C. Disminuye.</label><br>
+            <label><input type="radio" name="q77" value="incorrecto" required> D. Se convierte en energía cinética.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>78. Un objeto en movimiento con un momento lineal de 20 kg·m/s choca con otro objeto en reposo. ¿Cuál es el momento lineal total después de la colisión si no hay pérdidas?</label>
+        <div class="options">
+            <label><input type="radio" name="q78" value="correcto" required> A. 20 kg·m/s.</label><br>
+            <label><input type="radio" name="q78" value="incorrecto" required> B. 0 kg·m/s.</label><br>
+            <label><input type="radio" name="q78" value="incorrecto" required> C. 10 kg·m/s.</label><br>
+            <label><input type="radio" name="q78" value="incorrecto" required> D. 40 kg·m/s.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>79. Si un objeto en reposo es golpeado por otro en movimiento, ¿qué ocurre con el momento lineal del objeto en reposo?</label>
+        <div class="options">
+            <label><input type="radio" name="q79" value="correcto" required> A. Aumenta.</label><br>
+            <label><input type="radio" name="q79" value="incorrecto" required> B. Disminuye.</label><br>
+            <label><input type="radio" name="q79" value="incorrecto" required> C. Permanece constante.</label><br>
+            <label><input type="radio" name="q79" value="incorrecto" required> D. Se reduce a cero.</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <label>80. Si un objeto de 5 kg se mueve a 2 m/s, ¿cuál es su momento lineal?</label>
+        <div class="options">
+            <label><input type="radio" name="q80" value="correcto" required> A. 10 kg·m/s.</label><br>
+            <label><input type="radio" name="q80" value="incorrecto" required> B. 2 kg·m/s.</label><br>
+            <label><input type="radio" name="q80" value="incorrecto" required> C. 5 kg·m/s.</label><br>
+            <label><input type="radio" name="q80" value="incorrecto" required> D. 1 kg·m/s.</label>
+        </div>
+    </div>
+
+    <button class="submit-btn" onclick="calculateGrade()">Obtener Calificación</button>
+</div>
+
+<div class="popup" id="finalPopup" style="display: none;">
+    <div class="popup-content">
+        <h2>Resultado de la Evaluación</h2>
+        <p id="nombreFinal"></p>
+        <p id="nieFinal"></p>
+        <p id="gradeFinal"></p>
+        <button onclick="closePopup()">Cerrar</button>
+    </div>
+</div>
+
+<script>
+    const authorizedNIEs = [
+        "4839280", "19711634", "4839293", "6297544", "19711644",
+        "3850927", "19711635", "4267835", "3293986", "19711278",
+        "19711637", "4267839", "19806177", "4839298", "4267832",
+        "4267843", "4839279", "4839301", "19964688"
+    ];
+
+    let timer;
+    let totalSeconds = 1800;
+
+    window.onload = function() {
+        document.getElementById('popup').style.display = 'flex';
+    };
+
+    function validatePopup() {
+        const nombre = document.getElementById('nombre').value;
+        const nie = document.getElementById('nie').value;
+
+        if (nombre === "" || nie === "") {
+            alert("Por favor, complete todos los campos.");
+        } else if (!authorizedNIEs.includes(nie)) {
+            alert("NIE no autorizado.");
+        } else {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('evaluation').style.display = 'block';
+            startTimer();
         }
+    }
 
-        function loadQuiz() {
-            const quizContainer = document.getElementById('quiz');
-            quizContainer.innerHTML = '';
-            quizData.forEach((data, index) => {
-                const questionContainer = document.createElement('div');
-                questionContainer.className = 'question';
+    function startTimer() {
+        timer = setInterval(function() {
+            totalSeconds--;
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            document.getElementById('timer').textContent = `Tiempo restante: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 
-                const questionTitle = document.createElement('h3');
-                questionTitle.innerText = `${index + 1}. ${data.question}`;
-                questionContainer.appendChild(questionTitle);
-
-                const optionsList = document.createElement('ul');
-                optionsList.className = 'options';
-
-                shuffle(data.answers).forEach(answer => {
-                    const option = document.createElement('li');
-                    const optionLabel = document.createElement('label');
-                    const optionInput = document.createElement('input');
-                    optionInput.type = 'radio';
-                    optionInput.name = `question${index}`;
-                    optionInput.value = answer.correct;
-                    optionLabel.appendChild(optionInput);
-                    optionLabel.appendChild(document.createTextNode(answer.text));
-                    option.appendChild(optionLabel);
-                    optionsList.appendChild(option);
-                });
-
-                questionContainer.appendChild(optionsList);
-                quizContainer.appendChild(questionContainer);
-            });
-        }
-
-        function submitQuiz() {
-            if (attempt >= maxAttempts) {
-                alert('Has alcanzado el número máximo de intentos.');
-                return;
+            if (totalSeconds <= 0) {
+                clearInterval(timer);
+                calculateGrade();
             }
+        }, 1000);
+    }
 
-            const resultsContainer = document.getElementById('results');
-            const answers = document.querySelectorAll('input[type="radio"]:checked');
-            let score = 0;
+    function calculateGrade() {
+        const totalQuestions = document.querySelectorAll('.question').length;
+        const correctAnswers = document.querySelectorAll('input[type="radio"]:checked[value="correcto"]').length;
+        const maxPoints = 10;
+        const grade = (correctAnswers / totalQuestions) * maxPoints;
 
-            quizData.forEach((data, index) => {
-                const selected = answers[index] ? answers[index].value === 'true' : null;
-                if (selected === true) {
-                    score += 0.4; // Each correct answer is worth 0.4 points
-                }
-            });
+        document.getElementById('nombreFinal').textContent = "Nombre: " + document.getElementById('nombre').value;
+        document.getElementById('nieFinal').textContent = "NIE: " + document.getElementById('nie').value;
+        document.getElementById('gradeFinal').textContent = "Su calificación es: " + grade.toFixed(2) + " de " + maxPoints;
 
-            score = Math.round(score * 10) / 10; // Round to one decimal place
-            let feedback = quizData.map((data, index) => {
-                const selected = answers[index] ? answers[index].value === 'true' : null;
-                let result;
-                if (selected === null) {
-                    result = "No contestada";
-                } else if (selected === true) {
-                    result = "Correcta";
-                } else {
-                    result = "Incorrecta";
-                }
-                return `<p>${index + 1}. ${result}</p>`;
-            }).join("");
+        document.getElementById('finalPopup').style.display = 'flex';
+    }
 
-            resultsContainer.innerHTML = `<h3>Resultados:</h3><p>Puntaje: ${score} / 10</p>${feedback}`;
+    function closePopup() {
+        document.getElementById('finalPopup').style.display = 'none';
+    }
+</script>
 
-            attempt++;
-            if (attempt >= maxAttempts) {
-                alert('Has alcanzado el número máximo de intentos.');
-            }
-        }
-
-        document.getElementById('submit').addEventListener('click', submitQuiz);
-
-        loadQuiz();
-    </script>
 </body>
 </html>
